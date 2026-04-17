@@ -14,29 +14,16 @@ AIRLINES = [Airline.AA, Airline.B6]
 def generate_html(data_list):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    cards_html = ""
+    # Generate table rows
+    rows_html = ""
     for item in data_list:
-        cards_html += f"""
-        <div class="card">
-            <div class="card-header">
-                <h2>MIA ✈️ {item['dest']}</h2>
-                <span class="dates">{OUT_DATE} to {IN_DATE}</span>
-            </div>
-            <div class="price-grid">
-                <div class="price-item">
-                    <span class="label">🔄 Round-Trip</span>
-                    <span class="value">{item['rt']}</span>
-                </div>
-                <div class="price-item">
-                    <span class="label">🛫 Outbound</span>
-                    <span class="value">{item['out']}</span>
-                </div>
-                <div class="price-item">
-                    <span class="label">🛬 Return</span>
-                    <span class="value">{item['ret']}</span>
-                </div>
-            </div>
-        </div>
+        rows_html += f"""
+        <tr>
+            <td class="dest-cell"><strong>{item['dest']}</strong><br><small>MIA ⇄ {item['dest']}</small></td>
+            <td class="price-cell">{item['rt']}</td>
+            <td class="price-cell">{item['out']}</td>
+            <td class="price-cell">{item['ret']}</td>
+        </tr>
         """
 
     html_template = f"""
@@ -45,37 +32,78 @@ def generate_html(data_list):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Flight Tracker: Miami to Caribbean</title>
+        <title>Miami Flight Board</title>
         <style>
-            :root {{ --teal: #008080; --orange: #ff8c00; --light: #f4f7f6; }}
-            body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e0f2f1 0%, #fff3e0 100%); margin: 0; padding: 20px; color: #333; min-height: 100vh; }}
-            .container {{ max-width: 800px; margin: 0 auto; }}
-            header {{ text-align: center; margin-bottom: 40px; }}
-            h1 {{ color: var(--teal); font-size: 2.5rem; margin-bottom: 10px; }}
-            .last-updated {{ color: #666; font-size: 0.9rem; }}
-            .card {{ background: white; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 25px; overflow: hidden; border-left: 8px solid var(--orange); }}
-            .card-header {{ background: #fafafa; padding: 20px; border-bottom: 1px solid #eee; }}
-            .card-header h2 {{ margin: 0; color: #444; }}
-            .dates {{ color: var(--teal); font-weight: bold; }}
-            .price-grid {{ display: grid; grid-template-columns: repeat(3, 1/3); padding: 20px; gap: 10px; }}
-            @media (max-width: 600px) {{ .price-grid {{ grid-template-columns: 1fr; }} }}
-            .price-item {{ display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 8px; background: #f9f9f9; }}
-            .label {{ font-size: 0.8rem; color: #888; text-transform: uppercase; margin-bottom: 5px; }}
-            .value {{ font-size: 1.1rem; font-weight: bold; color: var(--teal); }}
-            footer {{ text-align: center; margin-top: 40px; color: #999; font-size: 0.8rem; }}
+            :root {{ --teal: #008080; --orange: #ff8c00; --bg: #f8fafc; }}
+            body {{ 
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+                background-color: var(--bg); 
+                margin: 0; padding: 20px; color: #1e293b; 
+            }}
+            .container {{ max-width: 900px; margin: 0 auto; }}
+            header {{ text-align: center; margin-bottom: 30px; }}
+            h1 {{ color: var(--teal); margin-bottom: 5px; font-size: 2rem; }}
+            .last-updated {{ color: #64748b; font-size: 0.85rem; }}
+            
+            /* Table Styling */
+            .table-container {{ 
+                background: white; 
+                border-radius: 12px; 
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+                overflow-x: auto; /* For mobile responsiveness */
+                border: 1px solid #e2e8f0;
+            }}
+            table {{ 
+                width: 100%; 
+                border-collapse: collapse; 
+                text-align: left; 
+                min-width: 600px; /* Ensures columns don't get too squished */
+            }}
+            th {{ 
+                background-color: #f1f5f9; 
+                padding: 15px; 
+                font-size: 0.85rem; 
+                text-transform: uppercase; 
+                letter-spacing: 0.05em; 
+                color: #475569;
+                border-bottom: 2px solid #e2e8f0;
+            }}
+            td {{ padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }}
+            tr:hover {{ background-color: #f8fafc; }}
+            
+            .dest-cell {{ border-left: 4px solid var(--orange); }}
+            .price-cell {{ font-weight: 500; color: #0f172a; }}
+            
+            small {{ color: #94a3b8; font-size: 0.75rem; }}
+            footer {{ text-align: center; margin-top: 30px; color: #94a3b8; font-size: 0.8rem; }}
         </style>
     </head>
     <body>
         <div class="container">
             <header>
-                <h1>🌴 Flight Tracker</h1>
-                <p class="last-updated">Last checked: {now} (UTC)</p>
+                <h1>✈️ Caribbean Flight Monitor</h1>
+                <p class="last-updated">Last Refresh: {now} UTC</p>
+                <p><strong>Travel Dates:</strong> {OUT_DATE} to {IN_DATE}</p>
             </header>
-            <main>
-                {cards_html}
-            </main>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Destination</th>
+                            <th>🔄 Round-Trip</th>
+                            <th>🛫 Outbound (MIA Out)</th>
+                            <th>🛬 Return (MIA In)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows_html}
+                    </tbody>
+                </table>
+            </div>
+            
             <footer>
-                Generated by GitHub Actions & fli-library
+                Built with fli-library • Hosted on Vercel • Updates every 6 hours
             </footer>
         </div>
     </body>
