@@ -20,7 +20,7 @@ The dashboard is organized into two distinct tables (MIA vs. FLL) to clearly sep
 * **American Airlines** primarily appears in the MIA table.
 * **JetBlue** primarily appears in the FLL table.
 
-
+Access it at https://amapr24.github.io/flight-tracker/
 ## 🛠 Setup & Installation
 
 ### 1. Repository Secrets
