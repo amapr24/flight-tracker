@@ -1,9 +1,7 @@
 name: Flight Monitor & Deploy
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+  workflow_dispatch:  # triggered externally by cron-job.org
 
 permissions:
   contents: write # Important: Allows the bot to commit the index.html
