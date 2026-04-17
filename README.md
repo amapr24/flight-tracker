@@ -1,61 +1,78 @@
-# 🌴 CDC Flight Tracker
+# 🌴 Caribbean Flight Tracker
 
-A private automated flight price monitor that tracks **American Airlines** and **JetBlue** routes from Miami (**MIA**) and Fort Lauderdale (**FLL**) to the Dominican Republic.
+A private automated flight intelligence dashboard that tracks **American Airlines** and **JetBlue** routes from South Florida (**MIA** & **FLL**) to the Dominican Republic.
 
-Built with the [fli](https://github.com/punitarani/fli) library, this project bypasses the need for web scraping by interacting directly with Google Flights' internal API.
+Built with the [fli](https://github.com/punitarani/fli) library, this project bypasses the need for manual searching by interacting directly with Google Flights' internal API.
+
 
 ## 🚀 How it Works
 
-1.  **Search Logic**: The Python script (`main.py`) performs six searches per destination:
-    * Round-Trip from MIA and FLL.
-    * One-Way Outbound from MIA and FLL.
-    * One-Way Return to MIA and FLL.
-2.  **Automation**: A GitHub Action runs the script every 6 hours (triggered by a cron job).
-3.  **Deployment**: The script generates a static `index.html` dashboard. GitHub Actions commits this file back to the repository, and **Vercel** automatically redeploys the live site.
-4.  **Notifications**: If configured, the script can send real-time price alerts to your phone via **Pushover**.
+1.  **Dual-Origin Search**: The Python script (`main.py`) performs a full suite of searches for **both** Miami (MIA) and Fort Lauderdale (FLL) independently.
+2.  **Comparison Engine**: It fetches official Round-Trip bundles and compares them against "Mix & Match" One-Way fares to ensure you see the absolute lowest price.
+3.  **Automation**: Triggered by **cron-job.org**, a GitHub Action runs the script every 6 hours.
+4.  **Instant Deployment**: The script generates a travel-styled `index.html`. GitHub Actions commits this file back to the repo, and **Vercel** automatically redeploys the live dashboard.
+5.  **Alerts**: Real-time price notifications are sent to your phone via **Pushover**.
+
 
 ## 📊 The Dashboard
 
-The dashboard is split into two clear sections to account for airline hub differences (AA at MIA vs. JetBlue at FLL). It compares bundled Round-Trip prices against "Mix & Match" One-Way prices to find the absolute cheapest way to travel.
-
+The dashboard is organized into two distinct tables (MIA vs. FLL) to clearly separate airline hub operations:
+* **American Airlines** primarily appears in the MIA table.
+* **JetBlue** primarily appears in the FLL table.
 
 
 ## 🛠 Setup & Installation
 
 ### 1. Repository Secrets
-To run the automation, you must add the following secrets to your GitHub Repo (**Settings > Secrets and variables > Actions**):
-
+Add these to your GitHub Repo (**Settings > Secrets and variables > Actions**):
 * `PUSHOVER_TOKEN`: Your Pushover API Application Token.
 * `PUSHOVER_USER`: Your Pushover User Key.
 
 ### 2. GitHub Actions Permissions
-Ensure the workflow has permission to update your dashboard:
 1.  Go to **Settings > Actions > General**.
-2.  Under **Workflow permissions**, select **Read and write permissions**.
+2.  Under **Workflow permissions**, select **Read and write permissions**. (Required to update `index.html`).
 
 ### 3. Vercel Deployment
 1.  Connect your GitHub account to [Vercel](https://vercel.com).
 2.  Import this repository.
-3.  Vercel will detect the `index.html` and host your dashboard at a custom `.vercel.app` URL.
+3.  Vercel will host your dashboard at a custom `.vercel.app` URL.
 
-## 📂 Project Structure
 
-* `main.py`: The core engine. Handles flight searching, price comparison, and HTML generation.
-* `.github/workflows/monitor.yml`: The automation schedule and deployment logic.
-* `requirements.txt`: Python dependencies (`flights`, `requests`, `pydantic`).
-* `index.html`: The auto-generated dashboard (do not edit manually).
+## ⚙️ Configuration & Reference
 
-## ⚙️ Customization
+To update your dates or destinations, edit the `Configuration` section at the top of `main.py`.
 
-To change your travel dates or destinations, edit the `Configuration` section at the top of `main.py`:
-
+### 🗓️ Dates
+Dates must be in `YYYY-MM-DD` format.
 ```python
-# --- Configuration ---
-DESTINATIONS = [Airport.SDQ, Airport.PUJ, Airport.LRM]
 OUT_DATE = "2026-07-17"
 IN_DATE = "2026-07-21"
-AIRLINES = [Airline.AA, Airline.B6]
 ```
+
+### 📍 Airport Enums
+| Code | Enum |
+| :--- | :--- |
+| **MIA** | `Airport.MIA` |
+| **FLL** | `Airport.FLL` |
+| **SDQ** | `Airport.SDQ` |
+| **PUJ** | `Airport.PUJ` |
+| **LRM** | `Airport.LRM` |
+
+### ✈️ Airline Enums
+| Carrier | Enum Code |
+| :--- | :--- |
+| **American Airlines** | `Airline.AA` |
+| **JetBlue** | `Airline.B6` |
+| **Spirit Airlines** | `Airline.NK` |
+| **Delta Air Lines** | `Airline.DL` |
+| **Southwest** | `Airline.WN` |
+
+## 📂 Project Structure
+* `main.py`: Core logic for fetching data and building the HTML dashboard.
+* `.github/workflows/monitor.yml`: The automation engine that pushes updates.
+* `requirements.txt`: Required libraries (`flights`, `requests`, `pydantic`).
+* `index.html`: The auto-generated dashboard (do not edit manually).
+
 
 ## 🤖 Triggering Manually
 You can force a price refresh at any time by going to the **Actions** tab in this repository, selecting the **Flight Monitor & Deploy** workflow, and clicking **Run workflow**.
