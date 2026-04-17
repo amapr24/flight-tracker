@@ -1,9 +1,12 @@
-name: Flight Monitor
+name: Flight Monitor & Deploy
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # Runs every 6 hours
-  workflow_dispatch:      # Allows you to run it manually for testing
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write # Important: Allows the bot to commit the index.html
 
 jobs:
   build:
@@ -18,11 +21,18 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: |
-          pip install flights requests
+        run: pip install flights requests pydantic
 
       - name: Run monitor
         env:
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
         run: python main.py
+
+      - name: Commit and Push index.html
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          git add index.html
+          git commit -m "Auto-update flight prices [skip ci]" || echo "No changes to commit"
+          git push
