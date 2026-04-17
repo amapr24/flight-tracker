@@ -11,22 +11,24 @@
             .container { max-width: 1000px; margin: 0 auto; }
             header { text-align: center; margin-bottom: 30px; }
             h1 { color: var(--teal); margin-bottom: 5px; }
-            .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-x: auto; border: 1px solid #e2e8f0; }
+            h2 { color: #334155; margin-top: 40px; margin-bottom: 15px; font-size: 1.2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; }
+            .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-x: auto; border: 1px solid #e2e8f0; margin-bottom: 30px; }
             table { width: 100%; border-collapse: collapse; min-width: 700px; }
-            th { background: #f1f5f9; padding: 15px; font-size: 0.8rem; text-transform: uppercase; color: #475569; border-bottom: 2px solid #e2e8f0; }
+            th { background: #f1f5f9; padding: 15px; text-align: left; font-size: 0.8rem; text-transform: uppercase; color: #475569; border-bottom: 2px solid #e2e8f0; }
             td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
-            .dest-cell { border-left: 4px solid var(--orange); font-size: 1.1rem; }
-            .price-cell { font-weight: 500; }
-            .airport-tag { font-size: 0.7rem; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; margin-left: 5px; color: #475569; }
+            .dest-cell { border-left: 4px solid var(--orange); font-size: 1.1rem; width: 15%; }
+            .price-cell { font-weight: 500; width: 28%; }
+            footer { text-align:center; margin-top:40px; padding-bottom: 20px; color:#94a3b8; font-size:0.8rem; }
         </style>
     </head>
     <body>
         <div class="container">
             <header>
-                <h1>✈️ MIA & FLL to CDC</h1>
+                <h1>✈️ South Florida to Caribbean</h1>
                 <p><strong>Dates:</strong> 2026-07-17 to 2026-07-21</p>
-                <p style="font-size: 0.8rem; color: #64748b;">Monitoring American (MIA) and JetBlue (FLL)</p>
             </header>
+            
+            <h2>🛫 Departures from Miami (MIA)</h2>
             <div class="table-container">
                 <table>
                     <thead>
@@ -38,30 +40,67 @@
                         </tr>
                     </thead>
                     <tbody>
-        <tr>
-            <td class="dest-cell"><strong>SDQ</strong></td>
-            <td class="price-cell">$405.0 (American Airlines) <span class='airport-tag'>MIA</span></td>
-            <td class="price-cell">$209.0 (American Airlines) <span class='airport-tag'>MIA</span></td>
-            <td class="price-cell">$226.0 (American Airlines) <span class='airport-tag'>SDQ</span></td>
-        </tr>
-        
-        <tr>
-            <td class="dest-cell"><strong>PUJ</strong></td>
-            <td class="price-cell">$506.0 (American Airlines) <span class='airport-tag'>MIA</span></td>
-            <td class="price-cell">$255.0 (American Airlines) <span class='airport-tag'>MIA</span></td>
-            <td class="price-cell">$304.0 (JetBlue) <span class='airport-tag'>PUJ</span></td>
-        </tr>
-        
-        <tr>
-            <td class="dest-cell"><strong>LRM</strong></td>
-            <td class="price-cell">N/A</td>
-            <td class="price-cell">$430.0 (American Airlines) <span class='airport-tag'>MIA</span></td>
-            <td class="price-cell">N/A</td>
-        </tr>
-        </tbody>
+            <tr>
+                <td class="dest-cell"><strong>SDQ</strong></td>
+                <td class="price-cell">$405.0 (American Airlines)</td>
+                <td class="price-cell">$209.0 (American Airlines)</td>
+                <td class="price-cell">$226.0 (American Airlines)</td>
+            </tr>
+            
+            <tr>
+                <td class="dest-cell"><strong>PUJ</strong></td>
+                <td class="price-cell">$506.0 (American Airlines)</td>
+                <td class="price-cell">$255.0 (American Airlines)</td>
+                <td class="price-cell">$304.0 (American Airlines)</td>
+            </tr>
+            
+            <tr>
+                <td class="dest-cell"><strong>LRM</strong></td>
+                <td class="price-cell">N/A</td>
+                <td class="price-cell">$430.0 (American Airlines)</td>
+                <td class="price-cell">N/A</td>
+            </tr>
+            </tbody>
                 </table>
             </div>
-            <footer style="text-align:center; margin-top:20px; color:#94a3b8; font-size:0.8rem;">Updated: 2026-04-17 04:56:11 UTC</footer>
+
+            <h2>🛫 Departures from Fort Lauderdale (FLL)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Destination</th>
+                            <th>🔄 Round-Trip (Best)</th>
+                            <th>🛫 Outbound OW</th>
+                            <th>🛬 Return OW</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="dest-cell"><strong>SDQ</strong></td>
+                <td class="price-cell">$415.0 (JetBlue)</td>
+                <td class="price-cell">$205.0 (JetBlue)</td>
+                <td class="price-cell">$250.0 (JetBlue)</td>
+            </tr>
+            
+            <tr>
+                <td class="dest-cell"><strong>PUJ</strong></td>
+                <td class="price-cell">$507.0 (JetBlue)</td>
+                <td class="price-cell">$255.0 (JetBlue)</td>
+                <td class="price-cell">$304.0 (JetBlue)</td>
+            </tr>
+            
+            <tr>
+                <td class="dest-cell"><strong>LRM</strong></td>
+                <td class="price-cell">N/A</td>
+                <td class="price-cell">N/A</td>
+                <td class="price-cell">N/A</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+
+            <footer>Updated: 2026-04-17 05:06:18 UTC</footer>
         </div>
     </body>
     </html>
