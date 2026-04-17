@@ -5,7 +5,6 @@ from fli.search import SearchFlights
 from fli.models import Airport, FlightSearchFilters, FlightSegment, Airline, SortBy, PassengerInfo, TripType
 
 # --- Configuration ---
-# Including both Miami and Fort Lauderdale
 ORIGINS = [[Airport.MIA, 0], [Airport.FLL, 0]] 
 DESTINATIONS = [Airport.SDQ, Airport.PUJ, Airport.LRM]
 OUT_DATE = "2026-07-17"
@@ -77,10 +76,16 @@ def generate_html(data_list):
 
 def format_res(res):
     if not res: return "N/A"
-    # Handling list vs tuple (RT vs OW)
-    flight = res[0] if isinstance(res, list) else res[0]
+    
+    best_option = res[0]
+    
+    # If the result is a round-trip tuple (outbound, return), grab the outbound flight object
+    if isinstance(best_option, tuple):
+        flight = best_option[0]
+    else:
+        flight = best_option
+        
     airline = flight.legs[0].airline.value
-    # Get departure airport of the first leg
     apt = flight.legs[0].departure_airport.name
     return f"${flight.price} ({airline}) <span class='airport-tag'>{apt}</span>"
 
