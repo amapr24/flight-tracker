@@ -1,14 +1,15 @@
 import os
 import requests
 from fli.search import SearchFlights
-from fli.models import Airport, FlightSearchFilters, FlightSegment, Airline, SortBy, PassengerInfo
+from fli.models import Airport, FlightSearchFilters, FlightSegment, Airline, SortBy, PassengerInfo, TripType
 
 # --- Configuration ---
-DEPARTURE_CITY = Airport.MIA
+ORIGIN = Airport.MIA
 DESTINATIONS = [Airport.SDQ, Airport.PUJ, Airport.LRM]
-DEPARTURE_DATE = "2026-07-17" 
-AIRLINES = [Airline.AA, Airline.B6] # American and JetBlue
-PRICE_THRESHOLD = 500  # Set your max alert price here
+OUT_DATE = "2026-07-17"
+IN_DATE = "2026-07-21"
+AIRLINES = [Airline.AA, Airline.B6]
+PRICE_THRESHOLD = 550 
 
 def send_pushover(message):
     try:
@@ -18,51 +19,85 @@ def send_pushover(message):
             "message": message,
             "title": "Flight Price Alert ✈️"
         }
-        r = requests.post("https://api.pushover.net/1/messages.json", data=data)
-        r.raise_for_status()
+        requests.post("https://api.pushover.net/1/messages.json", data=data).raise_for_status()
     except Exception as e:
         print(f"Failed to send Pushover: {e}")
+
+def get_best_flight(search_obj, filters):
+    try:
+        results = search_obj.search(filters)
+        return results[0] if results else None
+    except:
+        return None
 
 def check_flights():
     search = SearchFlights()
     found_deals = []
 
     for dest in DESTINATIONS:
-        print(f"Checking flights to {dest.name}...")
-        
-        # Corrected Filters with PassengerInfo
-        filters = FlightSearchFilters(
-            passenger_info=PassengerInfo(adults=1), # This was the missing piece!
+        print(f"🔍 Analyzing MIA <-> {dest.name}...")
+
+        # 1. Check Official Round Trip
+        rt_filters = FlightSearchFilters(
+            trip_type=TripType.ROUND_TRIP,
+            passenger_info=PassengerInfo(adults=1),
             flight_segments=[
-                FlightSegment(
-                    departure_airport=[[DEPARTURE_CITY, 0]],
-                    arrival_airport=[[dest, 0]],
-                    travel_date=DEPARTURE_DATE
-                )
+                FlightSegment(departure_airport=[[ORIGIN, 0]], arrival_airport=[[dest, 0]], travel_date=OUT_DATE),
+                FlightSegment(departure_airport=[[dest, 0]], arrival_airport=[[ORIGIN, 0]], travel_date=IN_DATE)
             ],
             airlines=AIRLINES,
             sort_by=SortBy.CHEAPEST
         )
+        rt_result = get_best_flight(search, rt_filters)
+        
+        # 2. Check One Way Out
+        out_filters = FlightSearchFilters(
+            trip_type=TripType.ONE_WAY,
+            passenger_info=PassengerInfo(adults=1),
+            flight_segments=[FlightSegment(departure_airport=[[ORIGIN, 0]], arrival_airport=[[dest, 0]], travel_date=OUT_DATE)],
+            airlines=AIRLINES
+        )
+        out_one_way = get_best_flight(search, out_filters)
 
-        try:
-            results = search.search(filters)
-            if results:
-                cheapest = results[0]
-                print(f"Found: {dest.name} for ${cheapest.price}")
-                
-                if cheapest.price <= PRICE_THRESHOLD:
-                    # Accessing the airline name from the first leg of the trip
-                    airline_name = cheapest.legs[0].airline.value if cheapest.legs else "Unknown"
-                    deal_info = f"{dest.name}: ${cheapest.price} ({airline_name})"
-                    found_deals.append(deal_info)
-        except Exception as e:
-            print(f"Error searching for {dest.name}: {e}")
+        # 3. Check One Way Back
+        in_filters = FlightSearchFilters(
+            trip_type=TripType.ONE_WAY,
+            passenger_info=PassengerInfo(adults=1),
+            flight_segments=[FlightSegment(departure_airport=[[dest, 0]], arrival_airport=[[ORIGIN, 0]], travel_date=IN_DATE)],
+            airlines=AIRLINES
+        )
+        in_one_way = get_best_flight(search, in_filters)
+
+        # Comparison Logic
+        best_price = float('inf')
+        details = ""
+
+        # Option A: Round Trip
+        if rt_result:
+            # Note: For RT, fli returns a tuple; the price is usually in the first element
+            rt_price = rt_result[0].price
+            if rt_price < best_price:
+                best_price = rt_price
+                details = f"🔄 Round-Trip ({rt_result[0].legs[0].airline.value})"
+
+        # Option B: Mix & Match One-Ways
+        if out_one_way and in_one_way:
+            mix_price = out_one_way.price + in_one_way.price
+            if mix_price < best_price:
+                best_price = mix_price
+                details = f"🔀 Mix: {out_one_way.legs[0].airline.value} + {in_one_way.legs[0].airline.value}"
+
+        # If we found a viable price under the threshold
+        if best_price <= PRICE_THRESHOLD:
+            msg = (f"📍 MIA to {dest.name}\n"
+                   f"📅 {OUT_DATE} to {IN_DATE}\n"
+                   f"💰 ${best_price} | {details}")
+            found_deals.append(msg)
 
     if found_deals:
-        send_pushover("\n".join(found_deals))
-        print("Alert sent to Pushover!")
+        send_pushover("\n\n".join(found_deals))
     else:
-        print("No flights found under your price threshold.")
+        print("No flights found under threshold.")
 
 if __name__ == "__main__":
     check_flights()
